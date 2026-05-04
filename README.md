@@ -14,12 +14,13 @@
 - **Frontend:** Jinja2, HTML5, CSS (Pico.css), JavaScript
 - **Deployment:** Railway App
 
-## 💻 Запуск локально
+##  Запуск локально
 
 1. **Клонуйте репозиторій:**
-   ```bash
-   git clone [https://github.com/NarrowDuck/Coursework-.git](https://github.com/NarrowDuck/Coursework-.git)
-   cd Coursework-
+```bash
+git clone [https://github.com/NarrowDuck/Coursework-.git](https://github.com/NarrowDuck/Coursework-.git)
+cd Coursework-
+```
 
 2. **Створення віртуального оточення**
 ```bash
@@ -42,5 +43,5 @@ pip install -r requirements.txt
 uvicorn ui.main:app --reload
 ```
 
-## 🔗 Посилання
+## Посилання
 - **Live Demo:** [Переглянути проєкт у хмарі](https://web-production-649d5.up.railway.app/)
