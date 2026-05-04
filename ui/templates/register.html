@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article style="max-width: 600px; margin: auto;">
+    <header>
+        <h2>Реєстрація користувача</h2>
+    </header>
+
+    {% if error %}
+    <blockquote style="border-color: var(--del-color); color: var(--del-color);">
+        {{ error }}
+    </blockquote>
+    {% endif %}
+
+    <form action="/register" method="post">
+        <label for="username">Логін (Username) *</label>
+        <input type="text" id="username" name="username" placeholder="Введіть логін" required>
+
+        <label for="password">Пароль *</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required>
+
+        <label for="full_name">Повне ім'я</label>
+        <input type="text" id="full_name" name="full_name" placeholder="Іванов Іван">
+
+        <div class="grid">
+            <label for="age">
+                Вік
+                <input type="number" id="age" name="age" placeholder="20">
+            </label>
+            <label for="gender">
+                Стать
+                <select id="gender" name="gender">
+                    <option value="" selected>Не вказано</option>
+                    <option value="male">Чоловіча</option>
+                    <option value="female">Жіноча</option>
+                </select>
+            </label>
+        </div>
+
+        <button type="submit">Створити аккаунт</button>
+    </form>
+
+    <footer>
+        <small>Вже маєте аккаунт? <a href="/login">Увійти</a></small>
+    </footer>
+</article>
+{% endblock %}

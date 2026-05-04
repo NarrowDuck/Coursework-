@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hgroup>
+    <h1>Доступні черги</h1>
+    <h2>Виберіть чергу, щоб приєднатися або переглянути статус</h2>
+</hgroup>
+
+<section>
+    {% if queues %}
+        <div class="grid">
+            {% for queue in queues %}
+            <article>
+                <header><strong>{{ queue.name }}</strong></header>
+                <p>
+                    Статус:
+                    {% if queue.is_open %}
+                        <mark style="background: #d4edda; color: #155724;">Відкрита</mark>
+                    {% else %}
+                        <mark style="background: #f8d7da; color: #721c24;">Закрита</mark>
+                    {% endif %}
+                </p>
+                <footer>
+                    <a href="/queues/{{ queue.id }}" class="contrast">Переглянути</a>
+                </footer>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <ins>Наразі немає створених черг. Будьте першим!</ins>
+    {% endif %}
+</section>
+{% endblock %}

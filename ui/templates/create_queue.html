@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article style="max-width: 500px; margin: auto;">
+    <header>
+        <h2>Створення нової черги</h2>
+    </header>
+    <form action="/queues/create" method="post">
+        <label for="name">Назва черги</label>
+        <input type="text" id="name" name="name" placeholder="Наприклад: Залік з фізики" required>
+        <button type="submit">Створити</button>
+    </form>
+</article>
+{% endblock %}

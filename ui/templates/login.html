@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article style="max-width: 500px; margin: auto;">
+    <header>
+        <h2>Вхід в систему</h2>
+    </header>
+
+    {% if error %}
+    <blockquote style="border-color: #d81b60; color: #d81b60; background-color: #fce4ec;">
+        {{ error }}
+    </blockquote>
+    {% endif %}
+
+    <form action="/login" method="post">
+        <label for="username">Логін (Username)</label>
+        <input type="text" id="username" name="username" placeholder="Введіть логін" required>
+
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required>
+
+        <button type="submit">Увійти</button>
+    </form>
+
+    <footer>
+        <small>Ще немає акаунта? <a href="/register">Зареєструватися</a></small>
+    </footer>
+</article>
+{% endblock %}

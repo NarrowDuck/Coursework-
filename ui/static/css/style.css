@@ -1,0 +1,48 @@
+/* Основні відступи для всього сайту */
+main {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Стиль для відображення власного місця в черзі */
+.my-pos-card {
+    border: 2px solid var(--primary);
+    background-color: var(--card-background-color);
+    transition: transform 0.2s;
+}
+
+.my-pos-card:hover {
+    transform: scale(1.02);
+}
+
+/* Підсвічування рядка в таблиці, якщо це "Я" */
+tr.my-row {
+    background-color: rgba(16, 149, 193, 0.1) !important;
+    font-weight: bold;
+}
+
+/* Статуси черги */
+.status-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+}
+
+.status-open {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-closed {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Стилізація помилок */
+.error-message {
+    color: #d81b60;
+    background: #fce4ec;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}

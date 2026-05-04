@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header>
+    <nav aria-label="breadcrumb">
+        <ul>
+            <li><a href="/">Головна</a></li>
+            <li>Черга: {{ queue.name }}</li>
+        </ul>
+    </nav>
+    <h1>{{ queue.name }}</h1>
+</header>
+
+<div class="grid">
+    <!-- ЛІВА КОЛОНКА: Статус та Дії -->
+    <aside>
+        <article>
+            <h5>Статус:
+                {% if queue.is_open %}
+                    <ins>Відкрита</ins>
+                {% else %}
+                    <del>Закрита</del>
+                {% endif %}
+            </h5>
+
+            {% if user_id %}
+                {% if user_id == queue.owner_id %}
+                    <!-- ПАНЕЛЬ ХАЗЯЇНА -->
+                    <p><small>Ви адмін цієї черги</small></p>
+                    <form action="/queues/{{ queue.id }}/next" method="post">
+                        <button class="contrast">Викликати наступного</button>
+                    </form>
+
+                    {% if queue.is_open %}
+                    <form action="/queues/{{ queue.id }}/close" method="post">
+                        <button class="secondary outline">Закрити реєстрацію</button>
+                    </form>
+                    {% endif %}
+                {% else %}
+                    <!-- ПАНЕЛЬ КОРИСТУВАЧА -->
+                    {% if my_pos %}
+                        <div style="text-align: center; padding: 1rem; border: 2px solid var(--primary); border-radius: 8px;">
+                            <p>Ваше місце:</p>
+                            <h2 style="font-size: 3rem; margin: 0;">#{{ my_pos }}</h2>
+                        </div>
+                    {% elif queue.is_open %}
+                        <form action="/queues/{{ queue.id }}/join" method="post">
+                            <button>Зайняти місце в черзі</button>
+                        </form>
+                    {% else %}
+                        <p>Реєстрація закрита хазяїном.</p>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <p><a href="/login">Увійдіть</a>, щоб взаємодіяти з чергою.</p>
+            {% endif %}
+        </article>
+    </aside>
+
+    <!-- ПРАВА КОЛОНКА: Список людей -->
+    <section>
+        <!-- НОВИЙ БЛОК: Пошук і швидке видалення (тільки для хазяїна) -->
+        {% if user_id == queue.owner_id and queue.participants %}
+        <article style="padding: 1rem; margin-bottom: 1rem; background-color: var(--card-sectionning-background-color);">
+            <form id="remove_form" action="/queues/{{ queue.id }}/remove_by_select" method="post" style="margin: 0; display: flex; gap: 1rem; align-items: flex-end;">
+
+                <label for="user_search" style="flex-grow: 1; margin: 0;">
+                    Швидке видалення (пошук за іменем):
+
+                    <!-- ПОЛЕ ДЛЯ ВВОДУ ТЕКСТУ (тут будуть твої букви) -->
+                    <input list="user_options" id="user_search" placeholder="Почніть вводити ім'я..." style="margin-top: 0.5rem; margin-bottom: 0;" required autocomplete="off">
+
+                    <!-- ПРИХОВАНІ ВАРІАНТИ ДЛЯ ВИПАДАЮЧОГО СПИСКУ -->
+                    <datalist id="user_options">
+                        {% for entry in queue.participants %}
+                            <option data-id="{{ entry.user_id }}" value="#{{ loop.index }} - {{ entry.user.full_name or entry.user.username }}"></option>
+                        {% endfor %}
+                    </datalist>
+
+                    <!-- ПРИХОВАНЕ ПОЛЕ (саме воно відправить ID юзера на бекенд) -->
+                    <input type="hidden" name="user_to_remove_id" id="hidden_user_id">
+                </label>
+
+                <button type="submit" class="secondary outline" style="margin: 0; width: auto; border-color: #d81b60; color: #d81b60;">Видалити</button>
+            </form>
+        </article>
+
+        <!-- СКРИПТ, ЯКИЙ З'ЄДНУЄ ТЕКСТ ТА ID -->
+        <script>
+            const searchInput = document.getElementById('user_search');
+            const hiddenIdInput = document.getElementById('hidden_user_id');
+            const removeForm = document.getElementById('remove_form');
+
+            // Коли ти щось вводиш або обираєш...
+            searchInput.addEventListener('input', function(e) {
+                const options = document.getElementById('user_options').options;
+                hiddenIdInput.value = ""; // Очищаємо старе
+
+                // Шукаємо, чи збігається введений текст з кимось у списку
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].value === e.target.value) {
+                        hiddenIdInput.value = options[i].getAttribute('data-id'); // Забираємо ID
+                        break;
+                    }
+                }
+            });
+
+            // Блокуємо кнопку, якщо ти ввів ім'я, якого немає в черзі
+            removeForm.addEventListener('submit', function(e) {
+                if (!hiddenIdInput.value) {
+                    e.preventDefault(); // Зупиняємо відправку
+                    alert('Будь ласка, оберіть користувача саме з випадаючих підказок!');
+                }
+            });
+        </script>
+        {% endif %}
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Користувач</th>
+                        <th>Час запису</th>
+                        <!-- Показуємо колонку "Дії" тільки хазяїну -->
+                        {% if user_id == queue.owner_id %}
+                        <th style="text-align: right;">Дії</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in queue.participants %}
+                    <tr {% if user_id == entry.user_id %} style="background: var(--primary-focus);" {% endif %}>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ entry.user.full_name or entry.user.username }}</td>
+                        <td>{{ entry.joined_at.strftime('%H:%M:%S') }}</td>
+
+                        <!-- Показуємо кнопку видалення тільки хазяїну -->
+                        {% if user_id == queue.owner_id %}
+                        <td style="text-align: right;">
+                            <form action="/queues/{{ queue.id }}/remove/{{ entry.user_id }}" method="post" style="margin: 0;">
+                                <button type="submit" style="padding: 0.2rem 0.5rem; font-size: 0.8rem; background-color: #d81b60; border: none; width: auto; margin-left: auto;">
+                                    Видалити
+                                </button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">Черга порожня</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </figure>
+    </section>
+</div>
+{% endblock %}
